@@ -4,11 +4,11 @@ package rbtree
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-05-10 14:30:28
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-10 14:37:44
+ * @Last Modified time: 2020-05-10 14:48:35
  */
 
 type Node struct {
-	Key    int
+	Key    interface{}
 	Value  interface{}
 	Color  Color
 	Parent *Node
