@@ -4,7 +4,7 @@ package rbtree_test
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-05-11 14:41:40
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-11 15:17:40
+ * @Last Modified time: 2020-05-11 18:10:37
  */
 
 import (
@@ -36,4 +36,10 @@ func TestBSTree(t *testing.T) {
 
 	bstree.InsertOrReplace(4, 4)
 	fmt.Println(bstree.PrettyString())
+
+	fmt.Println(bstree.Search(1))
+	fmt.Println(bstree.Search(2))
+	fmt.Println(bstree.Search(3))
+	fmt.Println(bstree.Search(4))
+	fmt.Println(bstree.Search(5))
 }

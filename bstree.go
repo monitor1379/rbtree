@@ -4,7 +4,7 @@ package rbtree
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-05-11 14:39:28
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-11 14:57:20
+ * @Last Modified time: 2020-05-11 18:09:58
  */
 
 // BSTree is Binary Search Tree
@@ -60,10 +60,7 @@ func (t *BSTree) SearchInsertPosition(key interface{}) (*Node, *Node, int) {
 	var p *Node
 	var comp int
 
-	for {
-		if c == nil {
-			break
-		}
+	for c != nil {
 		comp = t.comparator.Compare(key, c.Key)
 		if comp == -1 {
 			p = c
@@ -80,7 +77,11 @@ func (t *BSTree) SearchInsertPosition(key interface{}) (*Node, *Node, int) {
 }
 
 func (t *BSTree) Search(key interface{}) (interface{}, bool) {
-	return nil, false
+	c, _, _ := t.SearchInsertPosition(key)
+	if c == nil {
+		return nil, false
+	}
+	return c.Value, true
 }
 
 func (t *BSTree) PrettyString() string {
