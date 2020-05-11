@@ -4,7 +4,7 @@ package rbtree_test
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-05-11 14:41:40
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-11 19:23:33
+ * @Last Modified time: 2020-05-11 23:12:42
  */
 
 import (
@@ -47,18 +47,18 @@ func TestBSTree(t *testing.T) {
 }
 
 func BenchmarkBSTreeRandomInsert(b *testing.B) {
-	b.ResetTimer()
-
 	tree := rbtree.NewIntBSTree()
+
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		tree.InsertOrReplace(rand.Int(), i)
 	}
 }
 
 func BenchmarkBSTreeWorstInsert(b *testing.B) {
-	b.ResetTimer()
-
 	tree := rbtree.NewIntBSTree()
+
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		tree.InsertOrReplace(i, i)
 	}

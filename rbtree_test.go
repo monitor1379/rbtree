@@ -4,7 +4,7 @@ package rbtree_test
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-05-10 14:38:53
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-11 20:33:50
+ * @Last Modified time: 2020-05-11 23:39:19
  */
 
 import (
@@ -18,43 +18,60 @@ import (
 func TestRBTree(t *testing.T) {
 	tree := rbtree.NewIntRBTree()
 
-	tree.InsertOrReplace(15, 15)
-	fmt.Println(tree.PrettyString())
+	keys := []int{
+		10,
+		51,
+		21,
+		37,
+		20,
+		58,
+		48,
+		16,
+		49,
+		84,
+		87,
+		74,
+		36,
+		15,
+	}
 
-	tree.InsertOrReplace(5, 5)
-	fmt.Println(tree.PrettyString())
+	for _, key := range keys {
+		fmt.Println(key)
+		tree.InsertOrReplace(key, key)
+		fmt.Println(tree.PrettyString())
+	}
+}
 
-	tree.InsertOrReplace(1, 1)
-	fmt.Println(tree.PrettyString())
-
-	// tree.InsertOrReplace(1, 1)
-	// fmt.Println(tree.PrettyString())
-
-	// tree.InsertOrReplace(15, 15)
-	// fmt.Println(tree.PrettyString())
-
-	// tree.InsertOrReplace(13, 13)
-	// fmt.Println(tree.PrettyString())
-
-	// tree.InsertOrReplace(4, 4)
-	// fmt.Println(tree.PrettyString())
-
+func TestRBTreeRandomInsert(t *testing.T) {
+	tree := rbtree.NewIntRBTree()
+	for i := 0; i < 10000; i++ {
+		tree.InsertOrReplace(rand.Int(), i)
+	}
 }
 
 func BenchmarkRBTreeRandomInsert(b *testing.B) {
-	b.ResetTimer()
-
 	tree := rbtree.NewIntRBTree()
+
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		tree.InsertOrReplace(rand.Int(), i)
 	}
 }
 
-func BenchmarkRBTreeWorstInsert(b *testing.B) {
-	b.ResetTimer()
-
+func BenchmarkRBTreeRandomInsertAndSearch(b *testing.B) {
 	tree := rbtree.NewIntRBTree()
+
+	keys := []int{}
 	for i := 0; i < b.N; i++ {
-		tree.InsertOrReplace(i, i)
+		keys = append(keys, rand.Int())
+	}
+
+	for i := 0; i < b.N; i++ {
+		tree.InsertOrReplace(keys[i], i)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		tree.Search(keys[i])
 	}
 }

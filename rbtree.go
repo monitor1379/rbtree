@@ -2,7 +2,7 @@
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-05-10 14:44:01
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-11 21:20:01
+ * @Last Modified time: 2020-05-11 23:07:09
  */
 
 package rbtree
@@ -63,58 +63,94 @@ func (t *RBTree) InsertOrReplace(key interface{}, value interface{}) {
 }
 
 func (t *RBTree) runCheckAndFix(c *Node) {
+	t.runCheckAndFixCIsRoot(c)
+}
+
+func (t *RBTree) runCheckAndFixCIsRoot(c *Node) {
 	// case 1: c is root
 	if c == t.root {
 		c.Color = ColorBlack
 		return
 	}
 
+	t.runCheckAndFixPIsBlack(c)
+}
+
+func (t *RBTree) runCheckAndFixPIsBlack(c *Node) {
 	// case 2: c.parent is black
 	if c.Parent.Color == ColorBlack {
 		return
 	}
 
+	t.runCheckAndFixDoubleRed(c)
+}
+
+func (t *RBTree) runCheckAndFixDoubleRed(c *Node) {
+	// case 3: c.uncle is red
+	// note that c.parent is red now
 	g := c.GetGrandparent()
 	p := c.Parent
 	u := c.GetUncle()
 
-	// case 3: c.uncle is red
-	// note that c.parent is red now
+	if g == nil {
+		return
+	}
+
 	if u != nil && u.Color == ColorRed {
 		p.Color = ColorBlack
 		u.Color = ColorBlack
 		g.Color = ColorRed
+
+		// recursive
 		t.runCheckAndFix(g)
 		return
 	}
 
-	// case 4: c.uncle is black
+	t.runCheckAndFixGPCRelationTriangle(c)
+}
+
+func (t *RBTree) runCheckAndFixGPCRelationTriangle(c *Node) {
+	// case 4: c.uncle is black and g/p/c relation is triangle
+
 	// note that c.parent is red too now
+	g := c.GetGrandparent()
+	p := c.Parent
+
 	gpcRelation := t.getGPCRelation(g, p, c)
+
+	if gpcRelation == gpcRelationLeftTriangle {
+		t.leftRotate(p)
+		c = c.Left
+	} else if gpcRelation == gpcRelationRightTriangle {
+		t.rightRotate(p)
+		c = c.Right
+	}
+
+	t.runCheckAndFixGPCRelationLine(c)
+}
+
+func (t *RBTree) runCheckAndFixGPCRelationLine(c *Node) {
+	// case 5: c.uncle is black and g/p/c relation is line
+
+	// note that c.parent is red too now
+	g := c.GetGrandparent()
+	p := c.Parent
+
+	gpcRelation := t.getGPCRelation(g, p, c)
+
 	if gpcRelation == gpcRelationLeftLine {
-		// right rotate g
+		// right rotate g and recolor p & g
 		t.rightRotate(g)
-		if g == t.root {
-			t.root = p
-		}
-		// recolor p and g
-		p.Color = ColorBlack
-		g.Color = ColorRed
-
 	} else if gpcRelation == gpcRelationRightLine {
-		// left  rotate g
+		// left  rotate g and recolor p & g
 		t.leftRotate(g)
-		if g == t.root {
-			t.root = p
-		}
-		// recolor p and g
-		p.Color = ColorBlack
-		g.Color = ColorRed
+	}
 
-	} else if gpcRelation == gpcRelationLeftTriangle {
-		// left rorate p
-	} else {
-		// right rotate p
+	p.Color = ColorBlack
+	g.Color = ColorRed
+	if g == t.root {
+		t.root = p
+		p.Parent = nil
 	}
 }
 
@@ -187,10 +223,6 @@ func (t *RBTree) leftRotate(c *Node) {
 }
 
 func (t *RBTree) getGPCRelation(g, p, c *Node) int {
-	if c.Parent != p || p.Parent != g {
-		panic("invalid g p c relation")
-	}
-
 	if g.Left == p {
 		if p.Left == c {
 			return gpcRelationLeftLine
