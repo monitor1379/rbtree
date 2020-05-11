@@ -4,13 +4,14 @@ package rbtree
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-05-11 14:39:28
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-11 18:09:58
+ * @Last Modified time: 2020-05-11 19:14:33
  */
 
 // BSTree is Binary Search Tree
 type BSTree struct {
 	root       *Node
 	comparator Comparator
+	size       int
 }
 
 func NewBSTree(comparator Comparator) *BSTree {
@@ -35,6 +36,8 @@ func (t *BSTree) InsertOrReplace(key interface{}, value interface{}) {
 		c.Value = value
 		return
 	}
+
+	t.size++
 
 	c = new(Node)
 	c.Key = key
@@ -82,6 +85,10 @@ func (t *BSTree) Search(key interface{}) (interface{}, bool) {
 		return nil, false
 	}
 	return c.Value, true
+}
+
+func (t *BSTree) Size() int {
+	return t.size
 }
 
 func (t *BSTree) PrettyString() string {

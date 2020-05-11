@@ -11,7 +11,7 @@ import (
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-05-10 14:30:28
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-11 15:16:27
+ * @Last Modified time: 2020-05-11 20:47:19
  */
 
 const (
@@ -52,6 +52,16 @@ func (c *Node) GetUncle() *Node {
 	return g.Left
 }
 
+func (c *Node) GetBrother() *Node {
+	if c.Parent == nil {
+		return nil
+	}
+	if c == c.Parent.Left {
+		return c.Parent.Right
+	}
+	return c.Parent.Left
+}
+
 func printTree(node *Node, n, i int, prefix string, output io.Writer) {
 	var curPrefix string
 	var subPrefix string
@@ -65,9 +75,9 @@ func printTree(node *Node, n, i int, prefix string, output io.Writer) {
 	}
 
 	if node == nil {
-		output.Write([]byte(fmt.Sprintf("%s: <nil>\n", curPrefix)))
+		output.Write([]byte(fmt.Sprintf("%s> <nil>\n", curPrefix)))
 	} else {
-		output.Write([]byte(fmt.Sprintf("%s: {Node Key=%v Value=%v Color=%v}\n", curPrefix, node.Key, node.Value, node.Color)))
+		output.Write([]byte(fmt.Sprintf("%s> {Node Key=%v Value=%v Color=%v}\n", curPrefix, node.Key, node.Value, node.Color)))
 	}
 
 	if node != nil {
