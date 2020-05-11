@@ -2,7 +2,7 @@
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-05-10 14:44:01
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-10 15:26:44
+ * @Last Modified time: 2020-05-11 14:41:30
  */
 
 package rbtree
@@ -28,6 +28,7 @@ func NewStringTree() *Tree {
 
 func (t *Tree) InsertOrReplace(key interface{}, value interface{}) {
 	c, p := t.searchInsertPosition(key)
+	_, _ = c, p
 
 }
 
