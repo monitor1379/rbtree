@@ -2,7 +2,7 @@
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-05-10 14:44:01
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-11 23:07:09
+ * @Last Modified time: 2020-05-12 11:16:01
  */
 
 package rbtree
@@ -30,6 +30,18 @@ func NewIntRBTree() *RBTree {
 
 func NewStringRBTree() *RBTree {
 	return NewRBTree(&StringComparator{})
+}
+
+func (t *RBTree) Put(key interface{}, value interface{}) {
+	t.InsertOrReplace(key, value)
+}
+
+func (t *RBTree) Get(key interface{}) (interface{}, bool) {
+	return t.Search(key)
+}
+
+func (t *RBTree) Remove(key interface{}) {
+	t.Delete(key)
 }
 
 func (t *RBTree) InsertOrReplace(key interface{}, value interface{}) {
@@ -236,4 +248,193 @@ func (t *RBTree) getGPCRelation(g, p, c *Node) int {
 			return gpcRelationRightLine
 		}
 	}
+}
+
+func getNodeColor(c *Node) Color {
+	if c == nil {
+		return ColorBlack
+	}
+	return c.Color
+}
+
+func (t *RBTree) Delete(key interface{}) {
+	c, _, _ := t.SearchInsertPosition(key)
+	if c == nil {
+		return
+	}
+
+	if c.Left != nil && c.Right != nil {
+		minimumSubNode := t.getMinimumSubNode(c.Right)
+		c.Key = minimumSubNode.Key
+		c.Value = minimumSubNode.Value
+		c = minimumSubNode
+	}
+
+	var child *Node
+	if c.Left == nil || c.Right == nil {
+		if c.Right == nil {
+			child = c.Left
+		} else {
+			child = c.Right
+		}
+		if c.Color == ColorBlack {
+			c.Color = getNodeColor(child)
+			t.deleteCase1(c)
+		}
+		t.replaceNode(c, child)
+		if c.Parent == nil && child != nil {
+			child.Color = ColorBlack
+		}
+	}
+	t.size--
+
+	/*
+		var child *Node
+		if c.Left != nil {
+			child = c.Left
+		} else {
+			child = c.Right
+		}
+
+		// if c.Color == Red && child.Color == Black
+		if c.Color == ColorRed {
+			if child == nil || child.Color == ColorBlack {
+				// remove c from the tree t
+				t.replaceNode(c, child)
+				return
+			}
+		}
+
+		// if c.Color == Black && child.Color == Red
+		if c.Color == ColorBlack {
+			if child != nil && child.Color == ColorRed {
+				child.Color = ColorBlack
+				// remove c from the tree t
+				t.replaceNode(c, child)
+				return
+			}
+		}
+
+		// c has at most one child, and
+		// c.Color == Black && child.Color == Black
+		t.deleteCase1(c)
+
+		// remove c from the tree t
+		t.replaceNode(c, child)
+	*/
+}
+
+func (t *RBTree) deleteCase1(c *Node) {
+	if c.Parent == nil {
+		return
+	}
+	t.deleteCase2(c)
+}
+
+func (t *RBTree) deleteCase2(c *Node) {
+	s := c.GetSibling()
+	if getNodeColor(s) == ColorRed {
+		c.Parent.Color = ColorRed
+		s.Color = ColorBlack
+		if c == c.Parent.Left {
+			t.leftRotate(c.Parent)
+		} else {
+			t.rightRotate(c.Parent)
+		}
+	}
+	t.deleteCase3(c)
+}
+
+func (t *RBTree) deleteCase3(c *Node) {
+	s := c.GetSibling()
+	if getNodeColor(c.Parent) == ColorBlack &&
+		getNodeColor(s) == ColorBlack &&
+		s != nil &&
+		getNodeColor(s.Left) == ColorBlack &&
+		getNodeColor(s.Right) == ColorBlack {
+		s.Color = ColorRed
+		t.deleteCase1(c.Parent)
+	} else {
+		t.deleteCase4(c)
+	}
+}
+
+func (t *RBTree) deleteCase4(c *Node) {
+	s := c.GetSibling()
+	if getNodeColor(c.Parent) == ColorRed &&
+		getNodeColor(s) == ColorBlack &&
+		s != nil &&
+		getNodeColor(s.Left) == ColorBlack &&
+		getNodeColor(s.Right) == ColorBlack {
+		s.Color = ColorRed
+		c.Parent.Color = ColorBlack
+	} else {
+		t.deleteCase5(c)
+	}
+}
+
+func (t *RBTree) deleteCase5(c *Node) {
+	s := c.GetSibling()
+	if c == c.Parent.Left &&
+		getNodeColor(s) == ColorBlack &&
+		s != nil &&
+		getNodeColor(s.Left) == ColorRed &&
+		getNodeColor(s.Right) == ColorBlack {
+		s.Color = ColorRed
+		s.Left.Color = ColorBlack
+		t.rightRotate(s)
+	} else if c == c.Parent.Right &&
+		getNodeColor(s) == ColorBlack &&
+		s != nil &&
+		getNodeColor(s.Right) == ColorRed &&
+		getNodeColor(s.Left) == ColorBlack {
+		s.Color = ColorRed
+		s.Right.Color = ColorBlack
+		t.leftRotate(s)
+	}
+	t.deleteCase6(c)
+}
+
+func (t *RBTree) deleteCase6(c *Node) {
+	s := c.GetSibling()
+	if s == nil {
+		return
+	}
+	s.Color = getNodeColor(c.Parent)
+	c.Parent.Color = ColorBlack
+	if c == c.Parent.Left && getNodeColor(s.Right) == ColorRed {
+		s.Right.Color = ColorBlack
+		t.leftRotate(c.Parent)
+	} else if getNodeColor(s.Left) == ColorRed {
+		s.Left.Color = ColorBlack
+		t.rightRotate(c.Parent)
+	}
+}
+
+func (t *RBTree) getMinimumSubNode(c *Node) *Node {
+	for {
+		if c.Left != nil {
+			c = c.Left
+		} else {
+			break
+		}
+	}
+	return c
+}
+
+func (t *RBTree) replaceNode(oldNode, newNode *Node) {
+	if t.root == oldNode {
+		t.root = newNode
+	} else {
+		if oldNode == oldNode.Parent.Left {
+			oldNode.Parent.Left = newNode
+		} else {
+			oldNode.Parent.Right = newNode
+		}
+	}
+
+	if newNode != nil {
+		newNode.Parent = oldNode.Parent
+	}
+
 }

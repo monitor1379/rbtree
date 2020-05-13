@@ -11,7 +11,7 @@ import (
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-05-10 14:30:28
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-11 22:27:15
+ * @Last Modified time: 2020-05-12 10:13:39
  */
 
 const (
@@ -52,8 +52,8 @@ func (c *Node) GetUncle() *Node {
 	return g.Left
 }
 
-func (c *Node) GetBrother() *Node {
-	if c.Parent == nil {
+func (c *Node) GetSibling() *Node {
+	if c == nil || c.Parent == nil {
 		return nil
 	}
 	if c == c.Parent.Left {
@@ -87,6 +87,9 @@ func printTree(node *Node, n, i int, prefix string, output io.Writer) {
 }
 
 func prettyString(node *Node) string {
+	if node == nil {
+		return "<empty>"
+	}
 	buf := bytes.Buffer{}
 
 	if node == nil {

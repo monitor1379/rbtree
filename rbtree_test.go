@@ -75,3 +75,37 @@ func BenchmarkRBTreeRandomInsertAndSearch(b *testing.B) {
 		tree.Search(keys[i])
 	}
 }
+
+func TestRBTreeDelete(t *testing.T) {
+	tree := rbtree.NewIntRBTree()
+
+	keys := []int{}
+	for i := 0; i < 10000; i++ {
+		keys = append(keys, rand.Int()%10000)
+	}
+
+	for i := 0; i < 10000; i++ {
+		tree.InsertOrReplace(keys[i], i)
+	}
+
+	fmt.Println(tree.PrettyString())
+	for i := 0; i < 10000; i++ {
+		fmt.Println("deleting:", keys[i])
+		tree.Delete(keys[i])
+	}
+	fmt.Println(tree.PrettyString())
+}
+
+func BenchmarkRBTreeRandomDelete(b *testing.B) {
+	tree := rbtree.NewIntRBTree()
+
+	keys := rand.Perm(b.N)
+	for i := 0; i < b.N; i++ {
+		tree.InsertOrReplace(keys[i], i)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		tree.Delete(keys[i])
+	}
+}
