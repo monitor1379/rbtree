@@ -42,6 +42,50 @@ func main() {
 ```
 
 
+You can create a rbtree object by:
+```go
+rbtree.NewIntRBTree()
+rbtree.NewStringRBTree()
+rbtree.NewRBTree(rbtree.Comparator)
+```
+
+
+Note that `rbtree.Comparator` is a type of `interface{}`: 
+```go
+// Comparetor.Compare returns an integer comparing two object lexicographically.
+// The result will be 0 if a==b, -1 if a < b, and +1 if a > b.
+//
+type Comparator interface {
+	Compare(interface{}, interface{}) int
+}
+```
+
+
+Such as:
+```go
+type IntComparator struct{}
+
+func (c *IntComparator) Compare(i, j interface{}) int {
+	ii, ok := i.(int)
+	if !ok {
+		panic(ErrInvalidInputTypeOfComparator)
+	}
+
+	jj, ok := j.(int)
+	if !ok {
+		panic(ErrInvalidInputTypeOfComparator)
+	}
+
+	if ii < jj {
+		return -1
+	} else if ii == jj {
+		return 0
+	}
+	return 1
+}
+```
+
+
 
 ## Benchmark
 
